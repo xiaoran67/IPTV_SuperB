@@ -1,0 +1,11 @@
+## 更新频率(北京时间)
+|直播源|黑白名单|
+| ---- | ---- |
+|每日4点|每周五0点|
+
+## 直播源
+||完整|精简|其他|
+| ---- | ---- | ---- | ---- |
+|txt|[live.txt](https://raw.githubusercontent.com/xiaoran67/IPTV-CCSH/refs/heads/main/output/live.txt)|[live_lite.txt](https://raw.githubusercontent.com/xiaoran67/IPTV-CCSH/refs/heads/main/output/live_lite.txt)|[other.txt](https://raw.githubusercontent.com/xiaoran67/IPTV-CCSH/refs/heads/main/output/others.txt)
+|m3u|[live.m3u](https://raw.githubusercontent.com/xiaoran67/IPTV-CCSH/refs/heads/main/output/live.m3u)|[live_lite.m3u](https://raw.githubusercontent.com/xiaoran67/IPTV-CCSH/refs/heads/main/output/live_lite.m3u)||
+

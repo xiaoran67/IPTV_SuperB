@@ -1,0 +1,64 @@
+name: 'Update WhiteList BlackList'
+
+on:
+  schedule:
+    - cron: '0 16 * * 4' # UTC 定时触发
+  workflow_dispatch: # 手动触发
+
+jobs:
+  run_job:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # 开放写权限，确保推送成功
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0  # 拉取完整历史，避免重定基冲突
+
+      - name: 强制同步远程最新代码
+        run: git fetch --prune && git reset --hard origin/main  # 确保本地与远程一致
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install opencc-python-reimplemented
+          sudo apt update && sudo apt install -y ffmpeg  # 补充脚本可能依赖的ffmpeg
+
+      - name: Run Python script
+        run: python assets/whitelist-blacklist/whitelist-blacklist.py
+
+      - name: 提交并推送变更
+        run: |
+          # 配置Git身份
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "actions@github.com"
+          
+          # 添加目标目录下的所有变更文件
+          git add assets/whitelist-blacklist/*
+          
+          # 无变更时跳过推送
+          if git diff --staged --quiet; then
+            echo "ℹ️ 无文件变更，无需推送"
+            exit 0
+          fi
+          
+          # 提交变更（含时间戳）
+          git commit -m "✔️ $(date +'%Y-%m-%d %H:%M:%S')"
+          
+          # 处理冲突：优先重定基同步远程，失败则强制拉取
+          git pull origin main --rebase --autostash || {
+            echo "⚠️ 重定基失败，强制同步远程代码";
+            git reset --hard origin/main;
+          }
+          
+          # 安全推送：优先正常推送，失败则强制推送
+          git push origin main --force-with-lease || git push origin main --force
+          echo "✅ 变更已成功推送"
